@@ -37,11 +37,18 @@ export async function processTextTags(content: string, ctx: Context): Promise<st
     console.log(`>>> First 300 chars: ${content.substring(0, 300)}...`);
 
     // 1. [SCHEDULE: YYYY-MM-DD HH:MM:SS | message] or [SCHEDULE: EVERY X MINUTES | message]
-    const scheduleRegex = /\[SCHEDULE:\s*([\d\-\: ]+|EVERY\s+\d+\s+(?:MINUTE|MINUTES|HOUR|HOURS))\s*\|\s*([^\]]+)\]/gi;
+    // Process SCHEDULE first and remove from content to prevent nested tags from being processed
+    // Use greedy matching to capture everything including nested brackets
+    const scheduleRegex = /\[SCHEDULE:\s*([\d\-\: ]+|EVERY\s+\d+\s+(?:MINUTE|MINUTES|HOUR|HOURS))\s*\|\s*(.+)\]/gi;
     let match;
+    const schedulesToRemove: string[] = [];
+    
     while ((match = scheduleRegex.exec(content)) !== null) {
+        const fullMatch = match[0];
         const timeSpec = match[1].trim();
         const msg = match[2].trim();
+        
+        schedulesToRemove.push(fullMatch);
         
         // Check if it's a recurring schedule
         const recurringMatch = timeSpec.match(/EVERY\s+(\d+)\s+(MINUTE|MINUTES|HOUR|HOURS)/i);
@@ -65,6 +72,11 @@ export async function processTextTags(content: string, ctx: Context): Promise<st
             results.push(`[SCHEDULE SUCCESS] Task set for ${timeSpec}`);
             console.log(`>>> [SCHEDULE TAG FOUND] at=${timeSpec}, msg=${msg}`);
         }
+    }
+    
+    // Remove SCHEDULE tags from content to prevent nested tags from being processed
+    for (const scheduleTag of schedulesToRemove) {
+        content = content.replace(scheduleTag, '');
     }
 
     // 2. [CMD: command] - Use lazy matching to handle paths with spaces
