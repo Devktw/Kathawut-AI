@@ -140,6 +140,21 @@ export async function initDB() {
         recurrence_minutes INTEGER DEFAULT NULL
     )`);
 
+    // Migrate existing scheduled_tasks table to add recurrence_minutes if missing
+    try {
+        // Check if recurrence_minutes column exists
+        const tableInfo = allQuery("PRAGMA table_info(scheduled_tasks)");
+        const hasRecurrence = tableInfo.some((col: any) => col.name === 'recurrence_minutes');
+        
+        if (!hasRecurrence) {
+            console.log("🔄 Migrating scheduled_tasks table...");
+            runQuery("ALTER TABLE scheduled_tasks ADD COLUMN recurrence_minutes INTEGER DEFAULT NULL");
+            console.log("✅ Migration completed: added recurrence_minutes column");
+        }
+    } catch (e) {
+        console.error("❌ Migration error:", e);
+    }
+
     // Create initial memory.md if not exists
     if (!fs.existsSync(MEMORY_FILE)) {
         try {
