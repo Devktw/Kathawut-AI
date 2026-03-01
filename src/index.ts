@@ -161,9 +161,22 @@ async function runAgent(userMessage: string, ctx: Context): Promise<void> {
                 const cleanReply = stripTags(msg.content);
 
                 if (tagResults.length > 0) {
+                    // Check if all results are "success only" (no data to process)
+                    const allSuccessOnly = tagResults.every(r => 
+                        r.includes('[SCHEDULE SUCCESS]') || 
+                        r.includes('[REMEMBER SUCCESS]') ||
+                        r.includes('[DOC SUCCESS]') ||
+                        r.includes('[FORGET SUCCESS]')
+                    );
+                    
                     // Show the "preparatory" message to the user if it exists
                     if (cleanReply) {
                         await ctx.reply(cleanReply);
+                    }
+                    
+                    // If all results are success-only, stop here (don't send back to AI)
+                    if (allSuccessOnly) {
+                        break;
                     }
 
                     const resultMsg = {
