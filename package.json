@@ -1,0 +1,59 @@
+{
+    "name": "kathawut-ai",
+    "version": "2.4.4",
+    "description": "ผู้ช่วยส่วนตัว AI ทรงประสิทธิภาพที่รันบนเครื่องของคุณ เชื่อมต่อผ่าน Telegram",
+    "main": "dist/index.js",
+    "type": "module",
+    "bin": {
+        "karn": "./bin/karn.js"
+    },
+    "files": [
+        "dist",
+        "bin",
+        "prompt.md",
+        "README.md",
+        "install.sh",
+        "install.ps1",
+        "install.bat",
+        "install-termux.sh"
+    ],
+    "scripts": {
+        "start": "bun run src/index.ts",
+        "dev": "bun --hot run src/index.ts",
+        "build": "bun build src/index.ts --outdir dist --target node --format esm && node scripts/build.js",
+        "prepublishOnly": "bun run build"
+    },
+    "keywords": [
+        "ai",
+        "assistant",
+        "telegram",
+        "bot",
+        "thai",
+        "typhoon",
+        "automation"
+    ],
+    "author": "Kathawut",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Devktw/Kathawut-AI.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Devktw/Kathawut-AI/issues"
+    },
+    "homepage": "https://github.com/Devktw/Kathawut-AI#readme",
+    "engines": {
+        "bun": ">=1.0.0"
+    },
+    "dependencies": {
+        "axios": "^1.13.6",
+        "dotenv": "latest",
+        "form-data": "^4.0.1",
+        "openai": "latest",
+        "sql.js": "^1.12.0",
+        "telegraf": "latest"
+    },
+    "devDependencies": {
+        "bun-types": "latest"
+    }
+}

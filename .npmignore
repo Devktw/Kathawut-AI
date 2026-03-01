@@ -1,0 +1,26 @@
+# Source files
+src/
+tsconfig.json
+
+# Development files
+.env
+.env.*
+settings.json
+database.sqlite
+memory.md
+
+# Debug files
+src/debug/
+
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Build scripts
+setup.ps1
+
+# Bun
+bun.lock

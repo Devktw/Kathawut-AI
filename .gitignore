@@ -1,0 +1,28 @@
+# Local sqlite databases
+*.sqlite
+
+# API Keys and Secrets (DO NOT COMMIT)
+.env
+
+# Dependencies
+node_modules/
+
+# User Data and Configuration (Managed locally)
+database.sqlite
+memory.md
+settings.json
+
+# Build results
+dist/
+out/
+build/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor (Optional)
+.vscode/
+.idea/
+*.swp
+*.swo
