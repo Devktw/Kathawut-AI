@@ -1,6 +1,6 @@
 {
     "name": "kathawut-ai",
-    "version": "2.4.14",
+    "version": "2.4.15",
     "description": "ผู้ช่วยส่วนตัว AI ทรงประสิทธิภาพที่รันบนเครื่องของคุณ เชื่อมต่อผ่าน Telegram",
     "main": "dist/index.js",
     "type": "module",

@@ -281,16 +281,34 @@ export const memory = {
         runQuery("DELETE FROM scheduled_tasks WHERE status = 'pending'");
     },
     cancelTask: (id: number) => {
-        // Get task info to check if it's recurring
-        const task = getQuery("SELECT * FROM scheduled_tasks WHERE id = ?", [id]);
+        // Get task info (check both pending and completed tasks)
+        let task = getQuery("SELECT * FROM scheduled_tasks WHERE id = ?", [id]);
         
-        if (task && task.recurrence_minutes) {
+        // If task not found by ID, it might have been completed and recreated
+        // Try to find a pending task with similar description
+        if (!task) {
+            console.log(`>>> [CANCEL] Task ID ${id} not found, searching by recent tasks...`);
+            // Get the most recent completed task to find its description
+            const recentCompleted = getQuery("SELECT * FROM scheduled_tasks WHERE id <= ? ORDER BY id DESC LIMIT 1", [id]);
+            if (recentCompleted && recentCompleted.recurrence_minutes) {
+                task = recentCompleted;
+                console.log(`>>> [CANCEL] Found related task: ${task.task_description}`);
+            }
+        }
+        
+        if (!task) {
+            console.log(`>>> [CANCEL ERROR] Cannot find task or related tasks for ID ${id}`);
+            return;
+        }
+        
+        if (task.recurrence_minutes) {
             // For recurring tasks, cancel all future instances with same description
-            runQuery("DELETE FROM scheduled_tasks WHERE task_description = ? AND status = 'pending'", [task.task_description]);
-            console.log(`>>> [CANCEL RECURRING] Cancelled all instances of: ${task.task_description}`);
+            const deleted = runQuery("DELETE FROM scheduled_tasks WHERE task_description = ? AND status = 'pending'", [task.task_description]);
+            console.log(`>>> [CANCEL RECURRING] Cancelled all pending instances of: ${task.task_description}`);
         } else {
             // For one-time tasks, just cancel this specific task
             runQuery("DELETE FROM scheduled_tasks WHERE id = ? AND status = 'pending'", [id]);
+            console.log(`>>> [CANCEL ONE-TIME] Cancelled task ID ${id}`);
         }
     }
 };

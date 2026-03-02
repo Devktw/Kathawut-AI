@@ -32,7 +32,7 @@ function buildSystemPrompt(): string {
     // Get all pending tasks
     const pendingTasks = memory.getPendingTasks();
     const tasksStr = pendingTasks.length > 0
-        ? pendingTasks.map(t => `- [${t.scheduled_at}] ${t.task_description}`).join("\n")
+        ? pendingTasks.map(t => `- [ID: ${t.id}] [${t.scheduled_at}] ${t.task_description}`).join("\n")
         : "(ไม่มีงานรออยู่)";
 
     const cwd = process.cwd();
