@@ -158,7 +158,7 @@ async function runAgent(userMessage: string, ctx: Context): Promise<void> {
 
             if (msg.content) {
                 const tagResults = await processTextTags(msg.content, ctx);
-                const cleanReply = stripTags(msg.content);
+                const cleanReply = stripTags(msg.content).trim();
 
                 if (tagResults.length > 0) {
                     // Check if all results are "success only" (no data to process)
@@ -169,8 +169,8 @@ async function runAgent(userMessage: string, ctx: Context): Promise<void> {
                         r.includes('[FORGET SUCCESS]')
                     );
                     
-                    // Show the "preparatory" message to the user if it exists
-                    if (cleanReply) {
+                    // Show the "preparatory" message to the user if it exists and is meaningful
+                    if (cleanReply && cleanReply.length > 1 && !cleanReply.match(/^[\[\]]+$/)) {
                         await ctx.reply(cleanReply);
                     }
                     
@@ -188,7 +188,7 @@ async function runAgent(userMessage: string, ctx: Context): Promise<void> {
                     continue;
                 }
 
-                if (cleanReply) {
+                if (cleanReply && cleanReply.length > 1 && !cleanReply.match(/^[\[\]]+$/)) {
                     await ctx.reply(cleanReply);
                 }
             }
@@ -244,8 +244,23 @@ async function startCron(bot: Telegraf<Context>) {
                         telegram: bot.telegram
                     } as any;
                     
-                    // Use runAgent to process tags in the reminder
-                    await runAgent(`[REMINDER] ${t.task_description}`, mockCtx);
+                    // Process tags FIRST to get raw results (this executes the commands)
+                    const tagResults = await processTextTags(t.task_description, mockCtx);
+                    
+                    // Strip tags from the original message to get clean reminder text
+                    const cleanMessage = stripTags(t.task_description);
+                    
+                    // Send to AI for natural language interpretation
+                    // AI only sees the results, NOT the tags (so it won't re-execute them)
+                    if (tagResults.length > 0) {
+                        const resultText = tagResults.join("\n");
+                        const aiPrompt = `[REMINDER TRIGGERED]\nTask: ${cleanMessage}\n\nResults:\n${resultText}\n\nกรุณาสรุปผลลัพธ์ให้ผู้ใช้ฟังแบบเป็นธรรมชาติ ไม่ต้องแสดงข้อมูลดิบ`;
+                        await runAgent(aiPrompt, mockCtx);
+                    } else {
+                        // No tags, just send the reminder text through AI
+                        await runAgent(`[REMINDER] ${cleanMessage}`, mockCtx);
+                    }
+                    
                     memory.completeTask(t.id);
                 } catch (e) {
                     console.error("Cron Error", e);
@@ -270,8 +285,10 @@ async function main() {
         const bot = new Telegraf(config.TELEGRAM_BOT_TOKEN);
 
     bot.command("new", async (ctx) => {
+        const pendingCount = memory.getPendingTasks().length;
         memory.clearHistory();
-        await ctx.reply("🧹 ล้างประวัติแล้ว");
+        memory.clearAllTasks();
+        await ctx.reply(`🧹 ล้างประวัติและงานที่ตั้งไว้แล้ว (ลบ ${pendingCount} งาน)`);
     });
 
     bot.on("text", async (ctx) => {

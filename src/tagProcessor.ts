@@ -249,20 +249,22 @@ export async function processTextTags(content: string, ctx: Context): Promise<st
 }
 
 export function stripTags(content: string): string {
+    // Remove SCHEDULE tags (including nested CMD tags inside)
+    content = content.replace(/\[SCHEDULE:[^\[]*(?:\[CMD:[^\]]*\][^\[]*)?\]/g, "");
+    
     return content
-        .replace(/\[SCHEDULE:[^\]]+\]/g, "")
-        .replace(/\[CMD:[^\]]+\]/g, "")
-        .replace(/\[REMEMBER:[^\]]+\]/g, "")
-        .replace(/\[FORGET:[^\]]+\]/g, "")
-        .replace(/\[FORGET_DOC:[^\]]+\]/g, "")
-        .replace(/\[SEND_FILE:[^\]]+\]/g, "")
-        .replace(/\[DOC:[^\]]+\][\s\S]*?\[\/DOC\]/g, "")
+        .replace(/\[CMD:[^\[]*\]/g, "")
+        .replace(/\[REMEMBER:[^\[]*\]/g, "")
+        .replace(/\[FORGET:[^\[]*\]/g, "")
+        .replace(/\[FORGET_DOC:[^\[]*\]/g, "")
+        .replace(/\[SEND_FILE:[^\[]*\]/g, "")
+        .replace(/\[DOC:[^\[]*\][\s\S]*?\[\/DOC\]/g, "")
         .replace(/\[SYSINFO\]/g, "")
-        .replace(/\[READ_FILE:[^\]]+\]/g, "")
-        .replace(/\[WRITE_FILE:[^\]]+\]/g, "")
-        .replace(/\[LIST_DIR:[^\]]+\]/g, "")
-        .replace(/\[DELETE_FILE:[^\]]+\]/g, "")
-        .replace(/\[OCR:[^\]]+\]/g, "")
+        .replace(/\[READ_FILE:[^\[]*\]/g, "")
+        .replace(/\[WRITE_FILE:[^\[]*\]/g, "")
+        .replace(/\[LIST_DIR:[^\[]*\]/g, "")
+        .replace(/\[DELETE_FILE:[^\[]*\]/g, "")
+        .replace(/\[OCR:[^\[]*\]/g, "")
         .replace(/\[EVENT\][^ \n]*/g, "") // Strip fake logs
         .replace(/\[STATUS\][^ \n]*/g, "") // Strip fake logs
         .replace(/\n{3,}/g, "\n\n") // collapse extra blank lines

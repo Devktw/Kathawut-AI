@@ -276,5 +276,8 @@ export const memory = {
         }
         // Mark current task as completed
         runQuery("UPDATE scheduled_tasks SET status = 'completed' WHERE id = ?", [id]);
+    },
+    clearAllTasks: () => {
+        runQuery("DELETE FROM scheduled_tasks WHERE status = 'pending'");
     }
 };

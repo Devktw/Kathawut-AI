@@ -17,6 +17,11 @@ dist/
 out/
 build/
 
+# Test files
+test-*.js
+test-*.md
+clear-tasks.js
+
 # Operating System Files
 .DS_Store
 Thumbs.db
