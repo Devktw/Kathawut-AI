@@ -79,9 +79,9 @@ ${C.blue}${C.b}    --- [ KARN AI SETUP SYSTEM ] --- ${C.reset}
             TYPHOON_BASE_URL: baseUrl,
             TYPHOON_MODEL: modelName,
             MAX_COMPLETION_TOKENS: 30000,
-            TEMPERATURE: 0.6,
-            TOP_P: 0.6,
-            TOP_K: 50,
+            TEMPERATURE: 0.5,
+            TOP_P: 0.85,
+            TOP_K: 30,
             REPETITION_PENALTY: 1.1,
             FREQUENCY_PENALTY: 0.0,
             PRESENCE_PENALTY: 0.0,
@@ -96,13 +96,13 @@ ${C.blue}${C.b}    --- [ KARN AI SETUP SYSTEM ] --- ${C.reset}
 }
 
 export const config = {
-    get TYPHOON_API_KEY() { 
+    get TYPHOON_API_KEY() {
         loadEnv();
-        return process.env.TYPHOON_API_KEY || ""; 
+        return process.env.TYPHOON_API_KEY || "";
     },
-    get TELEGRAM_BOT_TOKEN() { 
+    get TELEGRAM_BOT_TOKEN() {
         loadEnv();
-        return process.env.TELEGRAM_BOT_TOKEN || ""; 
+        return process.env.TELEGRAM_BOT_TOKEN || "";
     },
 
     get settings() {
