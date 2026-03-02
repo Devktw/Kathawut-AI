@@ -281,6 +281,16 @@ export const memory = {
         runQuery("DELETE FROM scheduled_tasks WHERE status = 'pending'");
     },
     cancelTask: (id: number) => {
-        runQuery("DELETE FROM scheduled_tasks WHERE id = ? AND status = 'pending'", [id]);
+        // Get task info to check if it's recurring
+        const task = getQuery("SELECT * FROM scheduled_tasks WHERE id = ?", [id]);
+        
+        if (task && task.recurrence_minutes) {
+            // For recurring tasks, cancel all future instances with same description
+            runQuery("DELETE FROM scheduled_tasks WHERE task_description = ? AND status = 'pending'", [task.task_description]);
+            console.log(`>>> [CANCEL RECURRING] Cancelled all instances of: ${task.task_description}`);
+        } else {
+            // For one-time tasks, just cancel this specific task
+            runQuery("DELETE FROM scheduled_tasks WHERE id = ? AND status = 'pending'", [id]);
+        }
     }
 };
