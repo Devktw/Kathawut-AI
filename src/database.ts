@@ -279,5 +279,8 @@ export const memory = {
     },
     clearAllTasks: () => {
         runQuery("DELETE FROM scheduled_tasks WHERE status = 'pending'");
+    },
+    cancelTask: (id: number) => {
+        runQuery("DELETE FROM scheduled_tasks WHERE id = ? AND status = 'pending'", [id]);
     }
 };

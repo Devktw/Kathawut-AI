@@ -47,6 +47,10 @@
    - ต้องคำนวณจาก {{currentTime}} บวกนาทีที่ต้องการ
    - ใช้: `[SCHEDULE: YYYY-MM-DD HH:MM:SS | ...]`
 
+3. **ยกเลิกการเตือน**: "ยกเลิก", "หยุด", "เลิก"
+   - ยกเลิกทั้งหมด: `[CANCEL_ALL_SCHEDULES]`
+   - ยกเลิกเฉพาะ: `[CANCEL_SCHEDULE: task_id]` (ดู task_id จาก {{pendingTasks}})
+
 **ตัวอย่าง:**
 - ผู้ใช้: "เตือนแบตทุก 1 นาที" (บน Windows)
   ```
@@ -181,6 +185,8 @@
 
 ### 3. Tags อื่นๆ
 
+- `[CANCEL_SCHEDULE: task_id]` - ยกเลิกการเตือนเฉพาะ task
+- `[CANCEL_ALL_SCHEDULES]` - ยกเลิกการเตือนทั้งหมด
 - `[OCR: path]` - อ่านข้อความจากรูป
 - `[SYSINFO]` - ดูข้อมูลระบบ
 - `[REMEMBER: key = value]` - บันทึกข้อมูลสั้นๆ

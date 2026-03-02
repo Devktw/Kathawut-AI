@@ -234,7 +234,26 @@ export async function processTextTags(content: string, ctx: Context): Promise<st
         }
     }
 
-    // 12. [OCR: path] - Extract text from image
+    // 12. [CANCEL_SCHEDULE: task_id] - Cancel specific task
+    const cancelRegex = /\[CANCEL_SCHEDULE:\s*(\d+)\]/g;
+    while ((match = cancelRegex.exec(content)) !== null) {
+        const taskId = parseInt(match[1].trim());
+        console.log(`>>> [CANCEL_SCHEDULE TAG FOUND] Task ID: ${taskId}`);
+        memory.cancelTask(taskId);
+        results.push(`[CANCEL_SCHEDULE SUCCESS] Cancelled task ${taskId}`);
+    }
+
+    // 13. [CANCEL_ALL_SCHEDULES] - Cancel all pending tasks
+    const cancelAllRegex = /\[CANCEL_ALL_SCHEDULES\]/g;
+    while ((match = cancelAllRegex.exec(content)) !== null) {
+        const pending = memory.getPendingTasks();
+        const count = pending.length;
+        console.log(`>>> [CANCEL_ALL_SCHEDULES TAG FOUND] Cancelling ${count} tasks`);
+        memory.clearAllTasks();
+        results.push(`[CANCEL_ALL_SCHEDULES SUCCESS] Cancelled ${count} tasks`);
+    }
+
+    // 14. [OCR: path] - Extract text from image
     const ocrRegex = /\[OCR:\s*(.+?)\]/gs;
     while ((match = ocrRegex.exec(content)) !== null) {
         const imagePath = resolvePath(match[1].trim());
@@ -253,6 +272,8 @@ export function stripTags(content: string): string {
     content = content.replace(/\[SCHEDULE:[^\[]*(?:\[CMD:[^\]]*\][^\[]*)?\]/g, "");
     
     return content
+        .replace(/\[CANCEL_SCHEDULE:[^\[]*\]/g, "")
+        .replace(/\[CANCEL_ALL_SCHEDULES\]/g, "")
         .replace(/\[CMD:[^\[]*\]/g, "")
         .replace(/\[REMEMBER:[^\[]*\]/g, "")
         .replace(/\[FORGET:[^\[]*\]/g, "")
